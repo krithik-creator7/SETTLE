@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settle — split expenses, simply</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div id="app" class="app">
+
+    <!-- ===================== SETUP SCREEN ===================== -->
+    <section id="setup-screen" class="screen">
+      <header class="brand">
+        <h1>Settle</h1>
+        <p>Split group expenses without the group chat math.</p>
+      </header>
+
+      <form id="setup-form" class="card">
+        <label class="field">
+          <span>Group name</span>
+          <input type="text" id="group-name" placeholder="Goa Trip" required />
+        </label>
+
+        <label class="field">
+          <span>Currency</span>
+          <select id="group-currency">
+            {% for code, c in currencies.items() %}
+              <option value="{{ code }}">{{ c.symbol }} {{ c.name }} ({{ code }})</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <div class="field">
+          <span>Participants</span>
+          <div id="participants-list" class="chip-list"></div>
+          <div class="chip-input-row">
+            <input type="text" id="participant-input" placeholder="Add a name and press Enter" />
+            <button type="button" id="add-participant-btn" class="btn btn-ghost">Add</button>
+          </div>
+          <p class="hint">Add at least two people.</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create group</button>
+      </form>
+    </section>
+
+    <!-- ==================== DASHBOARD SCREEN =================== -->
+    <section id="dashboard-screen" class="screen hidden">
+      <header class="dashboard-header">
+        <div>
+          <h1 id="dashboard-group-name">Group</h1>
+          <p id="dashboard-participants" class="muted"></p>
+        </div>
+        <button id="new-group-btn" class="btn btn-ghost">New group</button>
+      </header>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="expenses">Expenses</button>
+        <button class="tab-btn" data-tab="balances">Balances</button>
+        <button class="tab-btn" data-tab="settle">Settle up</button>
+      </div>
+
+      <!-- Expenses tab -->
+      <div id="tab-expenses" class="tab-panel active">
+        <form id="expense-form" class="card">
+          <h3>Add an expense</h3>
+
+          <label class="field">
+            <span>Description</span>
+            <input type="text" id="expense-description" placeholder="Dinner at the beach shack" required />
+          </label>
+
+          <div class="field-row">
+            <label class="field">
+              <span>Amount</span>
+              <input type="number" id="expense-amount" step="0.01" min="0.01" required />
+            </label>
+            <label class="field">
+              <span>Paid by</span>
+              <select id="expense-paid-by"></select>
+            </label>
+          </div>
+
+          <div class="field">
+            <span>Split among</span>
+            <div id="split-among-list" class="checkbox-list"></div>
+          </div>
+
+          <div class="field">
+            <span>Direct contributions <span class="muted">(optional — paid their share on the spot)</span></span>
+            <div id="contributions-list" class="contribution-list"></div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Add expense</button>
+        </form>
+
+        <div id="expense-list" class="expense-list"></div>
+      </div>
+
+      <!-- Balances tab -->
+      <div id="tab-balances" class="tab-panel">
+        <div id="balances-list" class="balances-list"></div>
+      </div>
+
+      <!-- Settle tab -->
+      <div id="tab-settle" class="tab-panel">
+        <div id="settlements-list" class="settlements-list"></div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script>
+    window.SETTLE_CURRENCIES = {{ currencies | tojson }};
+  </script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
